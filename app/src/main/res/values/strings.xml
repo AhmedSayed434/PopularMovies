@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+
+    <string name="most_popular">Most Popular</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="connection_error_message">No Connection! Do you want to try again?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+</resources>
