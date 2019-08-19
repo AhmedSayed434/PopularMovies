@@ -56,14 +56,14 @@ public class NetworkUtils {
         try {
             int timeoutMs = 1500;
             Socket sock = new Socket();
-            SocketAddress sockaddr = new InetSocketAddress("http://api.themoviedb.org", 80);
+            SocketAddress sockaddr = new InetSocketAddress("8.8.8.8", 53);
 
             sock.connect(sockaddr, timeoutMs);
             sock.close();
 
             return true;
         } catch (IOException e) {
-            return true;
+            return false;
         }
 
     }

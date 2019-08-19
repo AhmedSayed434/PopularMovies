@@ -20,11 +20,11 @@ public class Movie implements Parcelable {
     }
 
     private Movie(Parcel parcel){
-        voteAverage = parcel.readFloat();
         overview = parcel.readString();
-        releaseDate = parcel.readString();
         originalTitle = parcel.readString();
         posterPath = parcel.readString();
+        releaseDate = parcel.readString();
+        voteAverage = parcel.readFloat();
     }
 
     public Float getVoteAverage() {
@@ -82,7 +82,7 @@ public class Movie implements Parcelable {
         parcel.writeFloat(voteAverage);
     }
 
-    public final Parcelable.Creator<Movie> CREATOR = new Creator<Movie>() {
+    public static final Parcelable.Creator<Movie> CREATOR = new Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel parcel) {
             return new Movie(parcel);

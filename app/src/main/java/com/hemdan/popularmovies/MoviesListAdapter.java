@@ -1,6 +1,5 @@
 package com.hemdan.popularmovies;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,18 +8,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
+import com.hemdan.moviesapi.APIEndPoints;
+import com.hemdan.moviesapi.NetworkUtils;
 import com.hemdan.moviesapi.dto.Movie;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.MovieHolder> {
-    private final String TAG = "Movie Index and Title";
 
     private ArrayList<Movie> moviesList;
     private MovieItemClickListener movieItemClickListener;
 
-    public MoviesListAdapter(ArrayList<Movie> moviesList, MovieItemClickListener movieItemClickListener){
+    MoviesListAdapter(ArrayList<Movie> moviesList, MovieItemClickListener movieItemClickListener){
         this.moviesList = moviesList;
         this.movieItemClickListener = movieItemClickListener;
     }
@@ -36,27 +36,29 @@ public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.Mo
     @Override
     public void onBindViewHolder(@NonNull MovieHolder movieHolder, int i) {
         Movie movie = moviesList.get(i);
+        String TAG = "Movie Index and Title";
         Log.d(TAG, i + " " + movie.getOriginalTitle());
-//        Picasso.get()
-//                .load("http://image.tmdb.org/t/p/w185/" + movie.getPosterPath())
-//                .into(posterImage);
-        Glide.with(movieHolder.itemView.getContext())
-                .load("http://image.tmdb.org/t/p/w185/" + movie.getPosterPath())
-                .override(185,400)
+        Picasso.get()
+                .load(APIEndPoints.BASE_API_IMAGE_URL + movie.getPosterPath())
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.placeholder)
+                .fit()
                 .into(movieHolder.posterImage);
         movieHolder.bind(movie);
     }
 
     @Override
     public int getItemCount() {
-        return moviesList.size();
+        return (null == moviesList)? 0 : moviesList.size();
     }
+
+
 
     public class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView posterImage;
         Movie movie;
 
-        public MovieHolder(@NonNull View itemView) {
+        MovieHolder(@NonNull View itemView) {
             super(itemView);
 
             posterImage = itemView.findViewById(R.id.iv_movie);
@@ -64,11 +66,8 @@ public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.Mo
             posterImage.setOnClickListener(this);
         }
 
-        public void bind(Movie movie) {
+        void bind(Movie movie) {
             this.movie = movie;
-//            Picasso.get()
-//                    .load("http://image.tmdb.org/t/p/w185/" + movie.getPosterPath())
-//                    .into(posterImage);
         }
 
         @Override
@@ -79,5 +78,10 @@ public class MoviesListAdapter extends RecyclerView.Adapter<MoviesListAdapter.Mo
 
     public interface MovieItemClickListener{
         void onMovieClickListener(Movie movie);
+    }
+
+    void setMoviesList(ArrayList<Movie> moviesList){
+        this.moviesList = moviesList;
+        notifyDataSetChanged();
     }
 }

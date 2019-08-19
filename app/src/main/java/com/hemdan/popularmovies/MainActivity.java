@@ -2,10 +2,11 @@ package com.hemdan.popularmovies;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -21,12 +22,12 @@ import com.hemdan.moviesapi.NetworkUtils;
 import com.hemdan.moviesapi.dto.Movie;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MoviesListAdapter.MovieItemClickListener {
     private final String TOP_RATED_LIST_KEY = "TOP_RATED_LIST_KEY";
     private final String MOST_POPULAR_LIST_KEY = "MOST_POPULAR_LIST_KEY";
-    private final int WIDTH_DP = 140;
+
+    public static final String SELECTED_MOVIE_KEY = "SELECTED_MOVIE_KEY";
 
     private ArrayList<Movie> topRatedMoviesList;
     private ArrayList<Movie> mostPopularMoviesList;
@@ -41,27 +42,33 @@ public class MainActivity extends AppCompatActivity implements MoviesListAdapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        topRatedMoviesList = new ArrayList<>();
+        mostPopularMoviesList = new ArrayList<>();
+
         recyclerView = findViewById(R.id.rv_movies_list);
-//        loadingData = findViewById(R.id.pb_loading_data);
+        loadingData = findViewById(R.id.pb_loading_data);
+
+        int WIDTH_DP = 185;
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, calculateNoOfColumns(MainActivity.this, WIDTH_DP));
+        moviesListAdapter = new MoviesListAdapter(mostPopularMoviesList, MainActivity.this);
+        recyclerView.setLayoutManager(gridLayoutManager);
+//        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(moviesListAdapter);
 
         if(savedInstanceState != null){
             topRatedMoviesList = savedInstanceState.getParcelableArrayList(TOP_RATED_LIST_KEY);
             mostPopularMoviesList = savedInstanceState.getParcelableArrayList(MOST_POPULAR_LIST_KEY);
-            createAdapterAndShowData();
+            showData();
         } else {
             loadData();
         }
 
     }
 
-    private void createAdapterAndShowData() {
-//        loadingData.setVisibility(View.INVISIBLE);
-//        recyclerView.setVisibility(View.VISIBLE);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, calculateNoOfColumns(MainActivity.this, WIDTH_DP));
-        moviesListAdapter = new MoviesListAdapter(mostPopularMoviesList, MainActivity.this);
-        recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(moviesListAdapter);
+    private void showData() {
+        loadingData.setVisibility(View.INVISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
+        moviesListAdapter.setMoviesList(mostPopularMoviesList);
     }
 
     private void loadData() {
@@ -86,13 +93,11 @@ public class MainActivity extends AppCompatActivity implements MoviesListAdapter
         if(item.getItemId() == R.id.sort_by){
             if(item.getTitle().toString().equals(getString(R.string.most_popular))){
                 item.setTitle(R.string.top_rated);
-                moviesListAdapter = new MoviesListAdapter(mostPopularMoviesList, MainActivity.this);
-                recyclerView.setAdapter(moviesListAdapter);
+                moviesListAdapter.setMoviesList(mostPopularMoviesList);
                 return true;
             } else {
                 item.setTitle(R.string.most_popular);
-                moviesListAdapter = new MoviesListAdapter(topRatedMoviesList, MainActivity.this);
-                recyclerView.setAdapter(moviesListAdapter);
+                moviesListAdapter.setMoviesList(topRatedMoviesList);
                 return true;
             }
         }
@@ -101,7 +106,9 @@ public class MainActivity extends AppCompatActivity implements MoviesListAdapter
 
     @Override
     public void onMovieClickListener(Movie movie) {
-        Toast.makeText(MainActivity.this, movie.getOriginalTitle(), Toast.LENGTH_SHORT).show();
+        Intent movieDetailsIntent = new Intent(MainActivity.this, MovieDetails.class);
+        movieDetailsIntent.putExtra(SELECTED_MOVIE_KEY, movie);
+        startActivity(movieDetailsIntent);
     }
 
     class DataLoaderFromAPI extends AsyncTask<Void, Void, Void>{
@@ -118,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements MoviesListAdapter
             super.onPostExecute(aVoid);
             if((topRatedMoviesList != null && !topRatedMoviesList.isEmpty()) &&
                     (mostPopularMoviesList != null && !mostPopularMoviesList.isEmpty())){
-                createAdapterAndShowData();
+                showData();
             } else {
                 showErrorLoadingDataDialog();
             }
@@ -166,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements MoviesListAdapter
     public static int calculateNoOfColumns(Context context, float columnWidthDp) { // For example columnWidthdp=180
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float screenWidthDp = displayMetrics.widthPixels / displayMetrics.density;
-        int noOfColumns = (int) (screenWidthDp / columnWidthDp + 0.5); // +0.5 for correct rounding to int.
-        return noOfColumns;
+        return (int) (screenWidthDp / columnWidthDp + 0.5);
     }
 }

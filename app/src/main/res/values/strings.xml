@@ -6,4 +6,10 @@
     <string name="connection_error_message">No Connection! Do you want to try again?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+
+    <string name="original_title">Original Title:</string>
+    <string name="overview">Overview:</string>
+    <string name="average_rate">Average Rate:</string>
+    <string name="release_date">Release Date:</string>
+
 </resources>

@@ -34,7 +34,7 @@ public class APIEndPoints {
     private static final String POSTER_PATH_KEY = "poster_path";
 
 
-    public static final String BASE_API_IMAGE_URL = "https://api.themoviedb.org/3/movie";
+    public static final String BASE_API_IMAGE_URL = "http://image.tmdb.org/t/p/w185/";
 
     public static ArrayList<Movie> getMostPopularMoviesList(){
         String result = null;
